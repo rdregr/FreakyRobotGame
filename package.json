@@ -1,1 +1,1 @@
-{"name":"freakyrobotgame-web","version":"0.1.0","private":true,"scripts":{"start":"node server.js"},"dependencies":{"express":"^4.21.2","socket.io":"^4.8.1"}}
+{"name":"freakyrobotgame-v2","version":"2.0.0","private":true,"scripts":{"start":"node server.js","test":"node --check server.js"},"dependencies":{"express":"^4.21.2","socket.io":"^4.8.1"},"engines":{"node":">=18"}}
