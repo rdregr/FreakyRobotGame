@@ -182,40 +182,50 @@ $('op').onchange=()=>{$('opdesc').textContent=desc[$('op').value]};$('op').oncha
 let id='',room='',snap=null,worldMap='',yaw=0,pitch=0,locked=false,keys={},last=0,slidingUntil=0,lastShot=0,actors=new Map(),decoyActors=new Map(),fx=[],camera,renderer,scene,gun,companions=[],noticeUntil=0,abilityLast=0,aiming=false,velocityY=0;
 let sensitivity=2.2,paused=false;let companionPos=[];let voiceEnabled=false,localStream=null,peers=new Map(),talking=false,voicePartners=new Set(),pendingIce=new Map();const voiceConfig={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
 const colors={'Factory':0x18212b,'Neon Rooftops':0x18122c,'Bunker':0x171e1d,'Frostbite':0x294153,'Robotown':0x6c91ae};
-function makeWorld(map){worldMap=map;actors.clear();decoyActors.clear();companions=[];scene=new THREE.Scene();scene.background=new THREE.Color(colors[map]);scene.fog=new THREE.Fog(colors[map],25,75);camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.06,110);renderer=renderer||new THREE.WebGLRenderer({canvas:$('view'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));resize();scene.add(new THREE.HemisphereLight(0xa4c8f5,0x181c24,2.2));const l=new THREE.DirectionalLight(0xffe6ba,2.3);l.position.set(8,18,5);scene.add(l);
+function makeWorld(map){worldMap=map;actors.clear();decoyActors.clear();companions=[];scene=new THREE.Scene();scene.background=new THREE.Color(colors[map]);scene.fog=new THREE.Fog(colors[map],25,75);camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.06,110);renderer=renderer||new THREE.WebGLRenderer({canvas:$('view'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.25));resize();scene.add(new THREE.HemisphereLight(0xa4c8f5,0x181c24,2.2));const l=new THREE.DirectionalLight(0xffe6ba,2.3);l.position.set(8,18,5);scene.add(l);
 const mat=(color,emissive=0)=>new THREE.MeshStandardMaterial({color,roughness:.63,metalness:.28,emissive,emissiveIntensity:.25});
 function box(x,y,z,w,h,d,color){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));o.position.set(x,y,z);scene.add(o);return o}
 box(40,-.14,40,80,.3,80,map==='Frostbite'?0x9daeb9:0x3c4650);
 box(40,4,0,80,8,2,0x435361);box(40,4,80,80,8,2,0x435361);box(0,4,40,2,8,80,0x435361);box(80,4,40,2,8,80,0x435361);
-const layouts={'Factory':[[15,15,8,6],[52,50,9,7],[32,10,5,16],[38,53,6,15],[24,37,12,5],[55,25,9,7]],'Neon Rooftops':[[15,10,9,10],[56,10,9,10],[15,56,9,10],[56,56,9,10],[34,31,12,12]],'Bunker':[[19,8,4,25],[19,46,4,25],[55,8,4,25],[55,46,4,25],[8,35,20,4],[52,35,20,4],[34,22,11,5],[34,53,11,5]],'Frostbite':[[13,17,12,10],[53,17,12,10],[13,53,12,10],[53,53,12,10],[35,30,10,16]],'Robotown':[[8,24,19,26],[53,24,19,26],[36,34,8,12],[31,13,5,7],[44,60,5,7],[8,55,10,4],[62,18,10,4]]};
+const layouts={'Factory':[[15,15,8,6],[52,50,9,7],[32,10,5,16],[38,53,6,15],[24,37,12,5],[55,25,9,7]],'Neon Rooftops':[[15,10,9,10],[56,10,9,10],[15,56,9,10],[56,56,9,10],[34,31,12,12]],'Bunker':[[19,8,4,25],[19,46,4,25],[55,8,4,25],[55,46,4,25],[8,35,20,4],[52,35,20,4],[34,22,11,5],[34,53,11,5]],'Frostbite':[[13,17,12,10],[53,17,12,10],[13,53,12,10],[53,53,12,10],[35,30,10,16]],'Robotown':[]};
 for(const [x,z,w,d] of layouts[map]){const h=map==='Neon Rooftops'?6:map==='Bunker'?5:map==='Frostbite'?3:map==='Robotown'?(w>15?6:2.5):3;box(x+w/2,h/2,z+d/2,w,h,d,map==='Neon Rooftops'?0x41446f:map==='Frostbite'?0x9cabb7:0x6b6260);box(x+w/2,h+.08,z+d/2,w,.16,d,map==='Frostbite'?0xc4ecf8:0xcda04e)}
 if(map==='Factory'){for(let i=0;i<12;i++){box(5+i*6,7.2,40,.22,.45,70,0x334657);box(10+i*5,1,6,1.1,2,1.1,0x936a3d)}box(40,4,40,12,8,1,0x56606a)}
 if(map==='Neon Rooftops'){scene.background=new THREE.Color(0x070b20);for(let i=0;i<22;i++){let x=3+(i*13)%74,z=4+(i*29)%73;box(x,3.5,z,1,7,1,i%2?0x344e7b:0x8037b8);const glow=box(x,7,z,1.4,.18,1.4,i%2?0x12d9ff:0xff42ce);glow.material.emissive.setHex(i%2?0x12d9ff:0xff42ce);glow.material.emissiveIntensity=1.5}}
 if(map==='Bunker'){box(40,7.6,40,76,.35,76,0x263238);for(let i=0;i<11;i++)box(7+i*6.5,5.8,40,1,.5,68,0x3e514b);for(let i=0;i<8;i++)box(8+i*9,3.5,5,.5,2,.4,0xa93a34)}
 if(map==='Robotown'){
-  scene.background=new THREE.Color(0x7ba9cb);scene.fog=new THREE.Fog(0x7ba9cb,48,100);
-  // Original retro-future suburb: opposing homes, three lanes, central hover-bus.
-  for(const [x,z,color] of [[8,24,0xf6b95d],[53,24,0x62c6d6]]){
-    box(x+9.5,6.6,z+13,20,1.1,28,0x304c70); // sloped-looking flat sci-fi roof
-    for(const zz of [z+3,z+20]){box(x+9.5,3.7,zz,.2,1.7,3.5,0x9ceaff)}
-    box(x+9.5,2,z-.4,8,3,.5,color); // porch wall
-    box(x+9.5,4.8,z+26.4,10,1,.3,0x314961);
+  scene.background=new THREE.Color(0x88a6bd);scene.fog=new THREE.Fog(0x88a6bd,52,110);
+  // No dynamic point lights, shadows, neon glow objects, or postprocessing.
+  const solidParts=[{"x": 8, "z": 24, "w": 7, "d": 0.5, "h": 5, "y": 0}, {"x": 19, "z": 24, "w": 8, "d": 0.5, "h": 5, "y": 0}, {"x": 8, "z": 49.5, "w": 7, "d": 0.5, "h": 5, "y": 0}, {"x": 19, "z": 49.5, "w": 8, "d": 0.5, "h": 5, "y": 0}, {"x": 8, "z": 24, "w": 0.5, "d": 11, "h": 5, "y": 0}, {"x": 8, "z": 40, "w": 0.5, "d": 10, "h": 5, "y": 0}, {"x": 26.5, "z": 24, "w": 0.5, "d": 10, "h": 5, "y": 0}, {"x": 26.5, "z": 39, "w": 0.5, "d": 11, "h": 5, "y": 0}, {"x": 10, "z": 36, "w": 5, "d": 0.45, "h": 3.2, "y": 0}, {"x": 20, "z": 36, "w": 5, "d": 0.45, "h": 3.2, "y": 0}, {"x": 10, "z": 51, "w": 0.4, "d": 11, "h": 3.2, "y": 0}, {"x": 16, "z": 51, "w": 0.4, "d": 11, "h": 3.2, "y": 0}, {"x": 10, "z": 62, "w": 6, "d": 0.4, "h": 3.2, "y": 0}, {"x": 17, "z": 25, "w": 0.4, "d": 7, "h": 2.6, "y": 3.3}, {"x": 17, "z": 38, "w": 0.4, "d": 10, "h": 2.6, "y": 3.3}, {"x": 53, "z": 24, "w": 7, "d": 0.5, "h": 5, "y": 0}, {"x": 64, "z": 24, "w": 8, "d": 0.5, "h": 5, "y": 0}, {"x": 53, "z": 49.5, "w": 7, "d": 0.5, "h": 5, "y": 0}, {"x": 64, "z": 49.5, "w": 8, "d": 0.5, "h": 5, "y": 0}, {"x": 53, "z": 24, "w": 0.5, "d": 11, "h": 5, "y": 0}, {"x": 53, "z": 40, "w": 0.5, "d": 10, "h": 5, "y": 0}, {"x": 71.5, "z": 24, "w": 0.5, "d": 10, "h": 5, "y": 0}, {"x": 71.5, "z": 39, "w": 0.5, "d": 11, "h": 5, "y": 0}, {"x": 55, "z": 36, "w": 5, "d": 0.45, "h": 3.2, "y": 0}, {"x": 65, "z": 36, "w": 5, "d": 0.45, "h": 3.2, "y": 0}, {"x": 55, "z": 51, "w": 0.4, "d": 11, "h": 3.2, "y": 0}, {"x": 61, "z": 51, "w": 0.4, "d": 11, "h": 3.2, "y": 0}, {"x": 55, "z": 62, "w": 6, "d": 0.4, "h": 3.2, "y": 0}, {"x": 62, "z": 25, "w": 0.4, "d": 7, "h": 2.6, "y": 3.3}, {"x": 62, "z": 38, "w": 0.4, "d": 10, "h": 2.6, "y": 3.3}, {"x": 36, "z": 34, "w": 8, "d": 12, "h": 2.5, "y": 0}, {"x": 31, "z": 13, "w": 5, "d": 7, "h": 2.5, "y": 0}, {"x": 44, "z": 60, "w": 5, "d": 7, "h": 2.5, "y": 0}];
+  for(const w of solidParts){
+    const home=w.x<29?0xe0b676:w.x>50?0x79bdc5:0x5e7888;
+    box(w.x+w.w/2,w.y+w.h/2,w.z+w.d/2,w.w,w.h,w.d,home);
   }
-  // Floating street signs, sidewalks, lamp posts, street stripes.
-  for(const xx of [29,51]){box(xx,.08,40,2,.16,74,0x9ca8ac)}
-  for(let zz=7;zz<74;zz+=9)box(40,.025,zz,.35,.045,4,0xffd96a);
-  for(const [xx,zz] of [[30,10],[50,10],[30,70],[50,70]]){
-    box(xx,3.6,zz,.23,7,.23,0x2e465d);box(xx,7.2,zz,1.6,.35,1.6,0x66f4ff);
+  for(const hx of [8,53]){
+    // Ground floor remains clear and fully enterable. Upstairs slab leaves a stairwell opening.
+    box(hx+6.2,3.16,37,11.8,.22,24,0x9aadb9);
+    box(hx+17.2,3.16,37,2.1,.22,24,0x9aadb9);
+    box(hx+9.5,6.12,37,19,.35,26,0x3b536a);
+    // Interior stair ramp, ascending toward the front of the house.
+    for(let i=0;i<12;i++){
+      const z=46.65-i*.73, y=(i+1)*3.2/12;
+      box(hx+14.5,y/2,z,3.6,y,.72,0x71899a);
+    }
+    // Garage roof, garage back and side walls from shared server solids.
+    box(hx+5,3.22,56.5,6.3,.25,11.4,0x3b536a);
+    // Window trim and glass on the upper story (thin, nonblocking decorative planes).
+    for(const zz of [29,43]){
+      box(hx+.05,4.7,zz,.08,1.4,2.8,0x88d5e8);
+      box(hx+18.95,4.7,zz,.08,1.4,2.8,0x88d5e8);
+    }
+    // Yard boundaries with open flanking paths.
+    box(hx+4,1,68,8,2,.25,0x78917b);
+    box(hx+15,1,68,6,2,.25,0x78917b);
+    box(hx+3,.15,55,3,.3,3,0x4c6472);
   }
-  for(const [xx,zz] of [[14,14],[66,66],[14,67],[66,13]]){
-    box(xx,1.1,zz,2.3,2.2,2.3,0x32635e);box(xx,2.5,zz,3,.45,3,0x48a984);
-  }
-  // The seven large cover blocks match the authoritative server collision layout.
-  // Decorative pieces are intentionally placed off the playable lanes.
-  box(40,3,40,7,1,11,0x19bbdc);box(40,3.7,40,5,.35,9,0x173b61);
-  box(33.5,2,16.5,4,1,5,0xd47c4b);box(46.5,2,63.5,4,1,5,0xd47c4b);
-  box(40,0,40,18,.02,80,0x536374);
-  for(let zz=7;zz<74;zz+=9)box(40,.04,zz,.3,.05,3,0xf8d76d);
+  box(40,-.01,40,17,.08,78,0x64747d);
+  for(let z=8;z<73;z+=12)box(40,.055,z,.35,.04,4,0xe4d7a4);
+  box(40,2.8,40,7,1.1,10,0x447e93);
+  box(40,3.5,40,5,.25,8,0x2f4a61);
 }
 if(map==='Frostbite'){for(let i=0;i<18;i++){let x=6+i*4,z=7+(i*23)%67;const tower=box(x,2,z,.55,4,.55,0xc9e0ed);box(x,4.3,z,2,.25,2,0x7f9ab0)}box(40,.08,40,70,.1,2,0xc6d6e6)}
 const label=(text,x,z)=>{const c=document.createElement('canvas');c.width=512;c.height=96;const ctx=c.getContext('2d');ctx.fillStyle='#08111bdd';ctx.fillRect(0,0,512,96);ctx.font='bold 36px Arial';ctx.textAlign='center';ctx.fillStyle='#f9f1bc';ctx.fillText(text,256,60);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false}));sp.scale.set(3.7,.7,1);sp.position.set(x,2.5,z);scene.add(sp)};
